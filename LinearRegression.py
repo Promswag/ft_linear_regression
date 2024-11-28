@@ -98,7 +98,7 @@ class LinearRegression():
 	
 	def realtime(self, learning_rate: float=0.1, figsize: tuple[int | float]=(12, 6)):
 		self.learning_rate = learning_rate
-		fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=figsize)
+		fig, (ax1, ax2, ax3) = plt.subplots(ncols=3, figsize=figsize)
 		ax1.scatter(self.X_n, self.Y_n)
 		ax1.set_xlim(-0.05, 1.05)
 		ax1.set_ylim(-0.05, 1.05)
@@ -106,13 +106,22 @@ class LinearRegression():
 		ax2.set_ylim(-0.05, 10.05)
 		ax1.set_facecolor('#E0E0E0')
 		ax2.set_facecolor('#E0E0E0')
+		ax3.set_facecolor('#E0E0E0')
+		ax3.set_xlim(-50,1000)
+		ax3.set_ylim(0,1)
 		line1, = ax1.plot([], [])
 		line2, = ax2.plot([], [])
+		line3, = ax3.plot([], [])
+		line4, = ax3.plot([], [])
 
+		mse = []
+		rs = []
 		def init():
 			line1.set_data([], [])
 			line2.set_data([], [])
-			return line1, line2
+			line3.set_data([], [])
+			line4.set_data([], [])
+			return line1, line2, line3, line4
 
 		def animate(i):
 			theta0, theta1 = self.gradient_descent_step()
@@ -120,10 +129,15 @@ class LinearRegression():
 
 			self.gradient_descent_step_cost()
 			line2.set_data(np.array(self.costs)[:,0], np.array(self.costs)[:,1])
+			mse.append(sum((self.Y_n - (theta0 + theta1 * self.X_n)**2)) / self.m)
+			rs.append(1 - (sum((self.Y_n - (theta0 + theta1 * self.X_n))**2) / sum((self.Y_n - self.Y_n.mean())**2)))
+			line3.set_data(range(len(mse)), mse)
+			line4.set_data(range(len(rs)), rs)
+			# print(f"MSE: {mse} | R²: {rs}")
 
 			if i % 50 == 0:
 				stop_animation_trigger()
-			return line1, line2
+			return line1, line2, line3, line4
 		
 		def stop_animation_trigger():
 			if abs(sum(-2 * (self.Y_n - (self.theta0 + self.theta1 * self.X_n)))) < 0.01:
