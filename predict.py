@@ -1,5 +1,3 @@
-
-
 def main():
 	try:
 		mileage = input('Mileage of the car: ')
