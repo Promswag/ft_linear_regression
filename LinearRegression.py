@@ -3,7 +3,7 @@ import matplotlib.animation as animation
 import numpy as np
 
 class LinearRegression():
-	def __init__(self, X: np.ndarray[float, int], Y: np.ndarray[float, int], learning_rate: float=0.1, epochs: int=2000):
+	def __init__(self, X: np.ndarray[float, int], Y: np.ndarray[float, int], learning_rate: float=0.1, epochs: int=1000):
 		try:
 			if len(X) != len(Y): 
 				raise ValueError("LinearRegression: X and Y must be equal length.")
@@ -72,7 +72,7 @@ class LinearRegression():
 		plt.subplots_adjust(left=0.05, bottom=0.05, right=0.95, top=0.95)
 		plt.show()	
 	
-	def show_cost(self, figsize: tuple[int | float]=(12, 6)):
+	def show_cost(self, figsize: tuple[int | float]=(6, 6)):
 		if len(self.costs) == 0:
 			print("LinearRegression: No cost to plot.")
 			return
@@ -96,26 +96,38 @@ class LinearRegression():
 	def gradient_descent_step_cost(self):
 		self.costs.append([self.theta0, sum((self.Y_n - (self.theta0 + self.theta1 * self.X_n))**2)])
 	
-	def realtime(self, learning_rate: float=0.1, figsize: tuple[int | float]=(12, 6)):
+	def realtime(self, learning_rate: float=0.1, figsize: tuple[int | float]=(18, 6), labels: tuple[str, str]=None):
 		self.learning_rate = learning_rate
 		fig, (ax1, ax2, ax3) = plt.subplots(ncols=3, figsize=figsize)
+
 		ax1.scatter(self.X_n, self.Y_n)
 		ax1.set_xlim(-0.05, 1.05)
 		ax1.set_ylim(-0.05, 1.05)
+		ax1.set_facecolor('#E0E0E0')
+		ax1.set_title('Linear Regression')
+		ax1.set_xlabel('Normalised X' if labels is None else labels[0])
+		ax1.set_ylabel('Normalised Y' if labels is None else labels[1])
+		line1, = ax1.plot([], [])
+
 		ax2.set_xlim(-0.05, 1.05)
 		ax2.set_ylim(-0.05, 10.05)
-		ax1.set_facecolor('#E0E0E0')
 		ax2.set_facecolor('#E0E0E0')
-		ax3.set_facecolor('#E0E0E0')
-		ax3.set_xlim(-50,1000)
-		ax3.set_ylim(0,1)
-		line1, = ax1.plot([], [])
+		ax2.set_title('Gradient Descent')
+		ax2.set_xlabel("Intercept (theta0)")
+		ax2.set_ylabel("Sum of squared residuals (SSR)")
 		line2, = ax2.plot([], [])
-		line3, = ax3.plot([], [])
-		line4, = ax3.plot([], [])
+		
+		ax3.set_xlim(-50, 1050)
+		ax3.set_ylim(-0.05, 1.05)
+		ax3.set_facecolor('#E0E0E0')
+		ax3.set_title('Model Accuracy')
+		ax3.set_xlabel('Epochs (Iterations)')
+		line3, = ax3.plot([], [], label='MSE (Mean Square Error)')
+		line4, = ax3.plot([], [], label='R² (Coefficient of Determination)')
 
 		mse = []
 		rs = []
+
 		def init():
 			line1.set_data([], [])
 			line2.set_data([], [])
@@ -133,7 +145,6 @@ class LinearRegression():
 			rs.append(1 - (sum((self.Y_n - (theta0 + theta1 * self.X_n))**2) / sum((self.Y_n - self.Y_n.mean())**2)))
 			line3.set_data(range(len(mse)), mse)
 			line4.set_data(range(len(rs)), rs)
-			# print(f"MSE: {mse} | R²: {rs}")
 
 			if i % 50 == 0:
 				stop_animation_trigger()
@@ -143,7 +154,9 @@ class LinearRegression():
 			if abs(sum(-2 * (self.Y_n - (self.theta0 + self.theta1 * self.X_n)))) < 0.01:
 				ani.event_source.stop()
 
-		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=200, interval=0.1, blit=True)
+		ani = animation.FuncAnimation(fig, animate, init_func=init, frames=200, interval=1, blit=True)
+		plt.subplots_adjust(left=0.05, bottom=0.1, right=0.95, top=0.9, wspace=0.2)
+		plt.legend()
 		plt.show()
 
 	def predict(self, x_value: float | int, theta0: float=None, theta1: float=None):
@@ -155,11 +168,16 @@ class LinearRegression():
 
 	@staticmethod
 	def predict(x_value: float | int, theta0: float, theta1: float) -> float:
+		return theta0 + theta1 * x_value
+		
+	def to_file(self):
 		try:
-			with open("thetas") as file:
-				theta0 = file.readline()
-				theta1 = file.readline()
-				return theta0 + theta1 * x_value
+			with open('thetas', 'w') as file:
+				theta1 = self.theta1 * (self.Y.max() - self.Y.min()) / (self.X.max() - self.X.min())
+				theta0 = self.denormalize(self.theta0, self.Y) - theta1 * self.X.min()
+				file.write(f'{theta0},{theta1}')
 		except Exception as e:
 			print(f'{type(e).__name__}: {e}')
 			return None
+
+		
