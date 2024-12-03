@@ -11,9 +11,9 @@ def main():
 		lr = LR(X, Y)
 		lr.gradient_descent(save_cost=True)
 		lr.show_data()
-		# lr.show_cost()
-		# lr.reset()
-		# lr.realtime(labels=('Mileage (km)', 'Price (€)'))
+		lr.show_cost()
+		lr.reset()
+		lr.realtime(labels=('Mileage (km)', 'Price (€)'))
 		lr.to_file()
 
 	except Exception as e:

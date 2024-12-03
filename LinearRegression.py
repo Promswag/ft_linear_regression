@@ -141,7 +141,7 @@ class LinearRegression():
 
 			self.gradient_descent_step_cost()
 			line2.set_data(np.array(self.costs)[:,0], np.array(self.costs)[:,1])
-			mse.append(sum((self.Y_n - (theta0 + theta1 * self.X_n)**2)) / self.m)
+			mse.append(sum(((self.Y_n - (theta0 + theta1 * self.X_n)**2)) / self.m)**0.5)
 			rs.append(1 - (sum((self.Y_n - (theta0 + theta1 * self.X_n))**2) / sum((self.Y_n - self.Y_n.mean())**2)))
 			line3.set_data(range(len(mse)), mse)
 			line4.set_data(range(len(rs)), rs)
