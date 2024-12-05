@@ -18,15 +18,18 @@ def main():
 				theta0 = float(content[0])
 				theta1 = float(content[1])
 
+		mean = data['price'].mean()
 		data['estimated_price'] = theta0 + theta1 * data['km']
+
 		MAE = sum(abs(data['price'] - data['estimated_price'])) / len(data)
-		print(MAE)
-		return
+		print('MAE €: {}\nMAE %: {}'.format(
+			f'{MAE:.2f}', 
+			f'{(100 / mean * MAE):.2f}'
+		))
 
 		data['diff'] = abs(data['price'] - data['estimated_price'])
 		data['ratio'] = (100 / data['price']) * data['diff']
 		print(data['ratio'].mean())
-
 		
 	except Exception as e:
 		print(f'{type(e).__name__} : {e}')
