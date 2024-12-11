@@ -1,23 +1,24 @@
 from LinearRegression import LinearRegression as LR
 import pandas as pd
 
+
 def main():
-	try:
+    try:
+        data = pd.read_csv('data.csv')
+        X = data.iloc[:, 0]
+        Y = data.iloc[:, 1]
 
-		data = pd.read_csv('data.csv')
-		X = data.iloc[:, 0]
-		Y = data.iloc[:, 1]
+        lr = LR(X, Y)
+        lr.gradient_descent(save_cost=True)
+        lr.show_data()
+        lr.show_cost()
+        lr.reset()
+        lr.realtime(labels=('Mileage (km)', 'Price (€)'))
+        lr.to_file()
 
-		lr = LR(X, Y)
-		lr.gradient_descent(save_cost=True)
-		lr.show_data()
-		lr.show_cost()
-		lr.reset()
-		lr.realtime(labels=('Mileage (km)', 'Price (€)'))
-		lr.to_file()
+    except Exception as e:
+        print(f'{type(e).__name__} : {e}')
 
-	except Exception as e:
-		print(f'{type(e).__name__} : {e}')
 
 if __name__ == "__main__":
-	main()
+    main()
