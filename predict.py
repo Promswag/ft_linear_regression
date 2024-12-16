@@ -1,17 +1,21 @@
 from LinearRegression import LinearRegression as LR
+import os
 
 
 def main():
     try:
-        with open('thetas', 'r') as file:
-            content = file.readline().split(',')
-            if len(content) != 2:
-                print('Thetas file corrupted, set thetas:')
-                theta0 = float(input('theta0: '))
-                theta1 = float(input('theta1: '))
-            else:
-                theta0 = float(content[0])
-                theta1 = float(content[1])
+        theta0 = 0
+        theta1 = 0
+        path = 'thetas'
+        if os.path.isfile(path):
+            with open(path, 'r') as file:
+                content = file.readline().split(',')
+                if len(content) != 2:
+                    print('Thetas file corrupted')
+                    return
+                else:
+                    theta0 = float(content[0])
+                    theta1 = float(content[1])
         mileage = input('Mileage of the car: ')
         mileage = float(mileage)
         print(f'Estimated price: {LR.predict(mileage, theta0=theta0, theta1=theta1)}')
